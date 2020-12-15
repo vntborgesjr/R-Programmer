@@ -131,11 +131,13 @@ mean(with_q)
 
 # Remenmber that you need to scpe the backslash then it comes in 
 # double
+
 # Alternation - match the pattern a or b. look a lot like a logical 
-# OR in R. regex - "?:dog|cat"
+# OR in R. regex - "(?:dog|cat)"
 # In rebus, you use the function or to construct a regular expression 
 # with a set of alternative matches ex. or(dog, cat)
-# Character classes - are a bit like ANY_CHAR but wit a restriction
+
+# Character classes - are a bit like ANY_CHAR but with a restriction
 # on what characters are allowed. It maches any single character
 # that is in this set. A character class is specified by a square
 # brackets. regex ex. "[Aa]"; rebus ex. char_class("Aa")
@@ -144,6 +146,7 @@ mean(with_q)
 # rebus ex. negated_char_class("Aa").
 # Inside a character expression you don't need to scape characters
 # that might otherwise have a special meaning
+
 # Repetition
 # Pattern             | Regex       | rebus
 # Optional            | ?           | optional()
@@ -151,3 +154,115 @@ mean(with_q)
 # One or more         | +           | one_or_more()
 # Between m and n times| {n,m}      | repeated()
 
+# Alternation
+# Examples
+x <- c("grey sky", "gray elephant")
+
+# rebus form
+str_view(x, pattern = or("grey", "gray"))
+str_view(x, pattern = "gr" %R% or("e", "a") %R% "y")
+
+# Regex form
+str_view(x, pattern = "(?:grey|gray)")
+str_view(x, pattern = "gr(?:e|a)y")
+
+# Match Jeffrey or Geoffrey
+whole_names <- or("Jeffrey", "Geoffrey")
+str_view(boy_names, pattern = whole_names, match = TRUE)
+
+whole_names <- or("Je", "Geo") %R% "ffrey"
+str_view(boy_names, pattern = whole_names, match = TRUE)
+
+# Regex form
+whole_names <- "(?:Jeffrey|Geoffrey)"
+str_view(boy_names, pattern = whole_names, match = TRUE)
+whole_names <- "(?:Je|Geo)ffrey"
+str_view(boy_names, pattern = whole_names, match = TRUE)
+
+# Match Jeffrey or Geoffrey, another way
+common_ending <- or("Je", "Geo") %R% "ffrey"
+str_view(boy_names, pattern = common_ending, match = TRUE)
+
+# Match with alternate endings
+by_parts <- or("Je", "Geo") %R% "ff" %R% or("ry", "ery", "rey", "erey")
+str_view(boy_names, pattern = by_parts, match = TRUE)
+
+# Regex form
+by_parts <- "(?:Je|Geo)ff(?:ry|ery|rey|erey)"
+str_view(boy_names, pattern = by_parts, match = TRUE)
+
+# Match names that start with Cath or Kath
+ckath <- or("C", "K") %R% "ath"
+str_view(girl_names, pattern = ckath, match = TRUE)
+
+# Regex form
+ckath <- "(?:C|K)ath"
+str_view(girl_names, pattern = ckath, match = TRUE)
+
+# Character classes
+x <- c("grey sky", "gray elephant")
+str_view(x, pattern = "gr" %R% char_class("ae") %R% "y")
+str_view(x, pattern = "gr[ae]y")
+
+# Create character class containing vowels
+vowels <- char_class("aeiouAEIOU")
+
+# Print vowels
+vowels
+
+# See vowels in x with str_view()
+str_view(x, pattern = vowels)
+
+# See vowels in x with str_view_all()
+str_view_all(x, pattern = vowels)
+
+# Regex form 
+str_view(x, pattern = "[aeiouAEIOU]")
+str_view_all(x, pattern = "[aeiouAEIOU]")
+
+# Number of vowels in boy_names
+num_vowels <- str_count(boy_names, pattern = vowels)
+
+# Number of characters in boy_names
+name_length <- str_length(boy_names)
+
+# Calc mean number of vowels
+mean(num_vowels)
+
+# Calc mean fraction of vowels per name
+mean(num_vowels / name_length)
+
+# Repetition
+x <- c("ow", "ooh", "yeeeah!", "shh")
+str_view(x, pattern = one_or_more(vowels))
+str_view(x, pattern = zero_or_more(vowels))
+
+# Regex form
+str_view(x, pattern = "[aeiouAEIOU]+")
+str_view(x, pattern = "[aeiouAEIOU]*")
+
+# Vowels from last exercise
+vowels <- char_class("aeiouAEIOU")
+
+# See names with only vowels
+str_view(boy_names, 
+         pattern = exactly(one_or_more(vowels)), 
+         match = TRUE)
+
+# Regex
+str_view(boy_names, 
+         pattern = "^[aeiouAEIOU]+$", 
+         match = TRUE)
+
+# Use `negated_char_class()` for everything but vowels
+not_vowels <- negated_char_class("aeiouAEIOU")
+
+# See names with no vowels
+str_view(boy_names, 
+         pattern = exactly(one_or_more((not_vowels))), 
+         match = TRUE)
+
+# Regex form
+str_view(boy_names, 
+         pattern = "^[^aeiouAEIOU]+$", 
+         match = TRUE)
