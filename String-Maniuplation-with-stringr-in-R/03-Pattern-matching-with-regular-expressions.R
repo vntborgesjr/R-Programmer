@@ -266,3 +266,134 @@ str_view(boy_names,
 str_view(boy_names, 
          pattern = "^[^aeiouAEIOU]+$", 
          match = TRUE)
+
+# Shortcuts  -------------------------------------------
+# Range - you can specify a range using -. ex. 0-9
+# Match any number between 0 and 9 including
+char_class("0-9") # rebus
+"[0-9]" # regex
+# Match any lower case letter between a and z
+char_class("a-z") # rebus
+"[a-z]" # regex
+# Match any upper case letter
+char_class("A-Z") # rebus
+"[A-Z]" # regex
+
+# DGT in rebus \\d or [:digit:] regex specifies any digits
+DGT %R% 1
+
+# WRD or \w specifies a word character
+
+# SPC or \s specifies a white space 
+
+# Hunting for phone numbers 
+contact <- c("Call me at 555-555-0191",
+             "123 Main St",
+             "(555) 555 0191",
+             "Phone: 555.555.0191 Mobile: 555.555.0192")
+
+# Create a three digit pattern
+three_digits <- DGT %R% DGT %R% DGT
+
+# Test it
+str_view_all(contact, pattern = three_digits)
+
+# Regex form
+str_view_all(contact, pattern = "\\d\\d\\d")
+
+# Create a separator pattern
+separator <- char_class("-", ".", "(", ")", " ")
+
+# Test it
+str_view_all(contact, pattern = separator)
+
+# Regex form
+str_view_all(contact, pattern = "[-.() ]")
+str_view_all(contact, pattern = "[\\-\\.\\(\\)\\s]")
+
+# Create phone pattern
+phone_pattern <- optional(OPEN_PAREN) %R%
+  three_digits %R%
+  zero_or_more(separator) %R%
+  three_digits %R% 
+  zero_or_more(separator) %R%
+  three_digits %R% DGT
+
+# Test it           
+str_view_all(contact, pattern = phone_pattern)
+
+# Regex form
+str_view_all(contact, pattern = "[(]?\\d\\d\\d[-.() ]*\\d\\d\\d[-.() ]*\\d\\d\\d\\d")
+
+# Extract phone numbers
+str_extract(contact, pattern = phone_pattern)
+
+# Extract ALL phone numbers
+str_extract_all(contact, pattern = phone_pattern)
+
+# Extracting age and gender from accident narratives
+# Pattern to match one or two digits
+narratives <- c("19YOM-SHOULDER STRAIN-WAS TACKLED WHILE PLAYING FOOTBALL W/ FRIENDS ",
+                "31 YOF FELL FROM TOILET HITITNG HEAD SUSTAINING A CHI ",
+                "ANKLE STR. 82 YOM STRAINED ANKLE GETTING OUT OF BED ",
+                "TRIPPED OVER CAT AND LANDED ON HARDWOOD FLOOR. LACERATION ELBOW, LEFT. 33 YOF*",
+                "10YOM CUT THUMB ON METAL TRASH CAN DX AVULSION OF SKIN OF THUMB ",
+                "53 YO F TRIPPED ON CARPET AT HOME. DX HIP CONTUSION ",
+                "13 MOF TRYING TO STAND UP HOLDING ONTO BED FELL AND HIT FOREHEAD ON RADIATOR DX LACERATION",
+                "14YR M PLAYING FOOTBALL; DX KNEE SPRAIN ",
+                "55YOM RIDER OF A BICYCLE AND FELL OFF SUSTAINED A CONTUSION TO KNEE ",
+                "5 YOM ROLLING ON FLOOR DOING A SOMERSAULT AND SUSTAINED A CERVICAL STRA IN")
+age <- one_or_more(DGT)
+age <- DGT %R% optional(DGT)
+
+# Test it
+str_view(narratives, pattern = age)
+
+# Reges form
+str_view(narratives, pattern = "[\\d]+")
+str_view(narratives, pattern = "[\\d][\\d]?")
+
+# Pattern to match units 
+unit <- optional(" ") %R% char_class("YO", "YR", "MO")
+unit <- optional(SPC) %R% or("YO", "YR", "MO")
+
+# Test pattern with age then units
+str_view(narratives, pattern = age %R% unit)
+
+# Regex form
+str_view(narratives, pattern = "[\\d][\\d]?[ ]?(?:YO|YR|MO)")
+
+# Pattern to match gender
+gender <- optional(SPC) %R% or("M", "F")
+
+# Test pattern with age then units then gender
+str_view(narratives, pattern = age %R% unit %R% gender)
+
+# Regex form
+str_view(narratives, pattern = "[\\d][\\d]?[ ]?(?:YO|YR|MO)[ ]?(?:M|F)")
+
+# Extract age, unit, gender
+age_gender <- str_extract(narratives, pattern = age %R% unit %R% gender)
+
+# Parsing age and gender into pieces
+# age_gender, age, gender, unit are pre-defined
+ls.str()
+
+# Extract age and make numeric
+ages_numeric <- as.numeric(str_extract(narratives, age))
+
+# Replace age and units with ""
+genders <- str_remove(age_gender, pattern = age %R% unit)
+
+# Replace extra spaces
+str_remove_all(genders, pattern = one_or_more(SPC))
+
+# Extract units 
+time_units <- str_extract(age_gender, pattern = unit)
+
+# Extract first word character
+time_units_clean <- str_extract(time_units, pattern = WRD)
+
+# Turn ages in months to years
+ifelse(time_units_clean == "Y", ages_numeric, ages_numeric/12)
+
