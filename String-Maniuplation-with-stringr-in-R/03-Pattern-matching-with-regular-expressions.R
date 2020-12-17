@@ -6,7 +6,7 @@
 # --------------------------------------------------- 
 #
 # Regular expressions  -------------------------------------------
-# RE area a language for describing patterns in strings
+# Regex area a language for describing patterns in strings
 # ^.[\d]+ - it describe the pattern "the start of the string, followed
 # by any single character, followed by one or more digits".
 # the same RE as rebu's expression: 
@@ -302,7 +302,7 @@ str_view_all(contact, pattern = three_digits)
 str_view_all(contact, pattern = "\\d\\d\\d")
 
 # Create a separator pattern
-separator <- char_class("-", ".", "(", ")", " ")
+separator <- or("-", ".", "(", ")", " ")
 
 # Test it
 str_view_all(contact, pattern = separator)
@@ -312,12 +312,13 @@ str_view_all(contact, pattern = "[-.() ]")
 str_view_all(contact, pattern = "[\\-\\.\\(\\)\\s]")
 
 # Create phone pattern
+four_digits <- dgt(4)
 phone_pattern <- optional(OPEN_PAREN) %R%
   three_digits %R%
   zero_or_more(separator) %R%
   three_digits %R% 
   zero_or_more(separator) %R%
-  three_digits %R% DGT
+  four_digits
 
 # Test it           
 str_view_all(contact, pattern = phone_pattern)
