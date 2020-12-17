@@ -109,3 +109,109 @@ str_view(narratives, pattern_regex2)
 # Pull out pieces
 str_match(narratives, pattern2)
 str_match(narratives, pattern_regex2)
+
+# Backreferences  -------------------------------------------
+# Is the action to refer to acaptured part of a pattern
+REF1 # rebus
+"\\1" # regex
+REF2 # rebus
+"\\2" # regex
+# Ex.
+SPC %R%
+  capture(one_or_more(WRD)) %R%
+  SPC %R%
+  REF1
+"\\s([\\w]+)\\s\\1"
+str_view("Paris in the  the spring", 
+         SPC %R%
+           capture(one_or_more(WRD)) %R%
+           SPC %R%
+           REF1)
+str_view("Paris in the  the spring", 
+         "\\s([\\w]+)\\s\\1")
+str_replace("Paris in the the spring",
+            "\\s([\\w]+)\\s\\1",
+            replacement = str_c(" ", REF1))
+
+# Using backreferences in patterns
+str_replace(boy_names, pattern = "^[:upper:]+", 
+            replacement = "[:lower:]")
+
+# Names with three repeated letters
+repeated_three_times <- capture(LOWER) %R%
+  REF1 %R%
+  REF1
+
+# Test it
+str_view(boy_names, pattern = repeated_three_times, match = TRUE)
+
+# Regex form
+str_view(boy_names, pattern = "([:lower:])\\1\\1", match = TRUE)
+
+# Names with a pair of repeated letters
+pair_of_repeated <- capture(LOWER) %R%
+  capture(LOWER) %R%
+  REF1 %R%
+  REF2
+
+# Test it
+str_view(boy_names, pattern = pair_of_repeated, match = TRUE)
+
+# Regex form
+str_view(boy_names, pattern = "([:lower:])([:lower:])\\1\\2", match = TRUE)
+
+# Names with a pair that reverses
+pair_that_reverses <- capture(LOWER) %R%
+  capture(LOWER) %R%
+  REF2 %R%
+  REF1
+
+# Test it
+str_view(boy_names, pattern = pair_that_reverses, match = TRUE)
+
+# Regex form
+str_view(boy_names, pattern = "([:lower:])([:lower:])\\2\\1", match = TRUE)
+
+# Four letter palindrome names
+four_letter_palindrome <- exactly(capture(LOWER) %R%
+            capture(LOWER) %R%
+            REF2 %R%
+            REF1)
+# Test it
+str_view(boy_names, pattern = four_letter_palindrome, match = TRUE)
+
+# Regex form
+str_view(boy_names, pattern = "^([:lower:])([:lower:])\\2\\1$", match = TRUE)
+
+# Repalcing with regular expression
+# View text containing phone numbers
+contact
+
+# Replace digits with "X"
+str_replace(contact, DGT, "X")
+
+# Replace all digits with "X"
+str_replace_all(contact, DGT, "X")
+
+# Replace all digits with different symbol
+str_replace_all(contact, DGT, c("X", ".", "*", "_"))
+
+# Replacing with backreferences
+# Build pattern to match words ending in "ING"
+pattern <- "ING" 
+str_view(narratives, pattern)
+
+# Test replacement
+str_replace(narratives, capture(pattern), 
+            str_c("CARELESSLY", REF1, sep = " "))
+
+# One adverb per narrative
+adverbs_10 <- sample(adverbs, 10)
+
+# Replace "***ing" with "adverb ***ly"
+str_replace(narratives, capture(pattern), 
+            str_c(adverbs_10, REF1, sep = " "))
+
+
+x <- c("hello", "sweet", "kitten")
+str_replace(x, capture(ANY_CHAR), str_c(REF1, REF1))
