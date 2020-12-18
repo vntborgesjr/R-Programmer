@@ -4,3 +4,9 @@
 # VNTBJR 
 # --------------------------------------------------- 
 #
+# Case study ------------------------------------------------
+# Getting the play into R
+library(stringi)
+library(stringr)
+# Read play in using stri_read_lines()
+earnest <- stri_read_lines("Datasets/earnest_file.txt")
