@@ -34,8 +34,8 @@ str_match(c("$5.50", "$32.00"), pattern = pattern_regex)
 
 # Capturing parts of a pattern
 hero_contacts <- c("(wolverine@xmen.com)",
-,       "wonderwoman@justiceleague.org",
-,       "thor@avengers.com" )
+       "wonderwoman@justiceleague.org",
+       "thor@avengers.com" )
 
 # Capture parts between @ and . and after .
 email <- capture(one_or_more(WRD)) %R% 
