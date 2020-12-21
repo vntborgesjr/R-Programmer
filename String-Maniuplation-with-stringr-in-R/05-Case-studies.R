@@ -33,9 +33,69 @@ play_text <- earnest_sub[- intro_line_index]
 writeLines(play_text[1:20])
 
 # Identify the lines, take 1
+# Get rid of empty strings
+empty <- stri_isempty(play_text)
+play_lines <- play_text[!empty]
+
 # Pattern for start, word then .
-pattern_1 <- ___
+pattern_1 <- START %R% one_or_more(WRD) %R% DOT
+pattern_1_regex <- "^[\\w]+\\."
 
 # Test pattern_1
-str_view(play_lines, ___, match = ___) 
-str_view(play_lines, ___, match = ___)
+str_view(play_lines, pattern_1, match = TRUE) 
+str_view(play_lines, pattern_1, match = FALSE)
+
+# Regex form
+str_view(play_lines, pattern_1_regex, match = TRUE) 
+
+# Pattern for start, capital, word then .
+pattern_2 <- START %R% 
+  ascii_upper() %R%
+  one_or_more(WRD) %R%
+  DOT
+pattern_2_regex <- "^[A-Z][\\w]+\\."
+
+# Test pattern_2
+str_view(play_lines, pattern_2, match = TRUE)
+str_view(play_lines, pattern_2, match = FALSE)
+
+# Regex form
+str_view(play_lines, pattern_2_regex, match = TRUE)
+
+# Get subset of lines that match
+lines <- str_subset(play_lines, pattern_2)
+
+# Extract match from lines
+who <- str_extract(lines, pattern_2)
+
+# Let's see what we have
+unique(who)
+
+# Identifying the lines, take 2
+# Create vector of characters
+characters <- c("Algernon", "Jack", "Lane", "Cecily", "Gwendolen", "Chasuble", 
+                "Merriman", "Lady Bracknell", "Miss Prism")
+
+# Match start, then character name, then .
+pattern_3 <- START %R%
+  or1(characters) %R%
+  DOT
+pattern_3_regex <- "^(?:Algernon|Jack|Lane|Cecily|Gwendolen|Chasuble|Merriman|Lady Bracknell|Miss Prism)\\."
+
+# View matches of pattern_3
+str_view(play_lines, pattern_3)
+
+# View non-matches of pattern_3
+str_view(play_lines, pattern_3, match = FALSE)
+
+# Pull out matches
+lines <- str_subset(play_lines, pattern_3)
+
+# Extract match from lines
+who <- str_extract(lines, pattern_3)
+
+# Let's see what we have
+unique(who)
+
+# Count lines per character
+table(who)
