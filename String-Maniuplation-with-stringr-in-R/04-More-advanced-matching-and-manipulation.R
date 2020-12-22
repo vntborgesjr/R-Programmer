@@ -124,14 +124,14 @@ SPC %R%
 "\\s([\\w]+)\\s\\1"
 str_view("Paris in the  the spring", 
          SPC %R%
-,  capture(one_or_more(WRD)) %R%
-,  SPC %R%
-,  REF1)
+  capture(one_or_more(WRD)) %R%
+  SPC %R%
+  REF1)
 str_view("Paris in the  the spring", 
          "\\s([\\w]+)\\s\\1")
 str_replace("Paris in the the spring",
-,   "\\s([\\w]+)\\s\\1",
-,   replacement = str_c(" ", REF1))
+   "\\s([\\w]+)\\s\\1",
+   replacement = str_c(" ", REF1))
 
 # Using backreferences in patterns
 str_replace(boy_names, pattern = "^[:upper:]+", 
