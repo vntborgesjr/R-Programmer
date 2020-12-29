@@ -88,6 +88,12 @@ ba_summary %>%
 
 In the time series, we see many days that have zero breathalyzer tests administered. In the entire five year period, there were at most eight tests in a day. There are many days with three or more tests in a day, and we wonder if the Iowa State football schedule may match up with some of those high test days. We next explore the Iowa State football schedule for 2013-2017. Data were downloaded from [sports-reference.com](https://www.sports-reference.com/cfb/).
 
+<p><img style="float: left;margin:5px 20px 5px 1px" src="C:/Users/clari/Documents/Vitor/DataCamp/R-Programmer/Projects/Drunken-Datetimes-in-Ames-Iowa/images/football.jpg"></p>
+<!--
+<img style="float: left;margin:5px 20px 5px 1px" src="C:/Users/clari/Documents/Vitor/DataCamp/R-Programmer/Projects/Drunken-Datetimes-in-Ames-Iowa/images/football.jpg">
+-->
+
+
 ```{r}
 # read in the football data 
 isu_fb <- read.csv("datasets/isu_football.csv", sep = ";")
